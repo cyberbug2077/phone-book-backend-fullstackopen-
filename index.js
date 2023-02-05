@@ -25,6 +25,8 @@ let persons = [
     }
 ]
 
+app.use(express.json())
+
 app.get('/api/persons', 
         (request, response) => {
             response.json(persons)
@@ -49,6 +51,31 @@ app.get('/api/persons/:id',
             }else{
                 response.status(404).end()
             }
+        }
+    )
+
+app.post('/api/persons/', 
+        (request, response) => {
+            const id = Math.floor(Math.random()*999999999999)
+            const person = request.body
+
+            if(!person.name || !person.number) {
+                return response.status(400).json({error: `name or number is missing`})
+            }
+
+            if(persons.reduce((p,c) => c.name === person.name ? ++p : p, 0)) {
+                return response.status(400).json({error: `name must be unique`})
+            }
+
+            const newPerson = {
+                name: person.name,
+                number: person.number,
+                id: id
+            }
+
+            persons = persons.concat(newPerson)
+
+            response.json(newPerson)
         }
     )
 
