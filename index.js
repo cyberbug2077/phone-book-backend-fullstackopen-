@@ -38,28 +38,24 @@ app.get('/api/persons/:id',(request, response, next) => {
     }
 )
 
-app.post('/api/persons/',
-    (request, response) => {
-        const body = request.body
+app.post('/api/persons/', (request, response, next) => {
+    const body = request.body
 
-        if (!body.name || !body.number) {
-            return response.status(400).json({ error: `name or number is missing` })
-        }
-
-        Person.find({ name: body.name })
-            .then(result => {
-                if (result.length === 0) {
-                    const newPerson = new Person({
-                        name: body.name,
-                        number: body.number,
-                    })
-                    newPerson.save().then(savedPerson => response.json(savedPerson))
-                } else {
-                    response.status(400).json({ error: `name must be unique` })
-                }
-            })
-    }
-)
+    Person.find({ name: body.name })
+        .then(result => {
+            if (result.length === 0) {
+                const newPerson = new Person({
+                    name: body.name,
+                    number: body.number,
+                })
+                newPerson.save()
+                    .then(savedPerson => response.json(savedPerson))
+                    .catch(error => next(error))
+            } else {
+                response.status(400).json({ error: `name must be unique` })
+            }
+        })
+})
 
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
@@ -75,7 +71,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         name: request.body.name,
         number: request.body.number
     }
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
         .then(result => {
             response.json(result)
         })
@@ -85,8 +81,10 @@ app.put('/api/persons/:id', (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
     console.error(error.message);
 
-    if(error.name === 'CastError') {
-        response.status(400).send({error:'malformatted id'})
+    if (error.name === 'CastError') {
+        response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name == 'ValidationError') {
+        response.status(400).json({ error: error.message })
     }
 
     next(error)
