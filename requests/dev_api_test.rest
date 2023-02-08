@@ -4,12 +4,22 @@ GET http://localhost:3001/api/persons/
 GET http://localhost:3001/info
 
 ### 
-
-
 GET http://localhost:3001/api/persons/63e1526307b20512dc0e0ad4
+
+### 
+GET http://localhost:3001/api/persons/badRequst
 
 ###
 POST http://localhost:3001/api/persons/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "ash",
+    "number": 12414312
+}
+
+###
+PUT http://localhost:3001/api/persons/63e27e50c0a215af7b38c555 HTTP/1.1
 Content-Type: application/json
 
 {
@@ -20,3 +30,5 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3001/api/persons/63e1526307b20512dc0e0ad4
+###
+DELETE  http://localhost:3001/api/persons/63e27e50c0a215af7b38c555 
